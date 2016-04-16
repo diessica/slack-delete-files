@@ -1,6 +1,6 @@
 {
   "name": "slack-delete-files",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Mass delete files from Slack.",
   "main": "index.js",
   "scripts": {
@@ -11,5 +11,8 @@
   "dependencies": {
     "got": "^6.3.0",
     "inquirer": "^1.0.0"
+  },
+  "bin": {
+    "slack-delete-files": "index.js"
   }
 }
