@@ -6,15 +6,15 @@ const API_URL = 'https://slack.com/api'
 
 /**
  * @param {String} token
- * @param {Boolean} onlyOldImages
+ * @param {Boolean} onlyOldFiles
  */
-function accessFiles (token, onlyOldImages) {
+function accessFiles (token, onlyOldFiles) {
   const thirtyDaysAgo = new Date().getTime() - 30 * (1000 * 60 * 60 * 24)
 
   got(`${API_URL}/files.list`, {
     body: {
       token: token,
-      ts_to: onlyOldImages ? thirtyDaysAgo : 0,
+      ts_to: onlyOldFiles ? thirtyDaysAgo : 0,
       count: 1000
     },
     json: true
@@ -49,10 +49,10 @@ inquirer.prompt([{
   name: 'token',
   type: 'input',
 }, {
-  message: 'Delete only 30 days old images?',
-  name: 'onlyOldImages',
+  message: 'Delete only files older than 30 days?',
+  name: 'onlyOldFiles',
   type: 'confirm',
   default: false
 }])
-  .then(answers => accessFiles(answers.token, answers.onlyOldImages))
+  .then(answers => accessFiles(answers.token, answers.onlyOldFiles))
   .catch(error => console.error('Error while asking for token.', error))
