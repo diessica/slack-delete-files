@@ -1,0 +1,58 @@
+'use strict'
+
+const got = require('got')
+const inquirer = require('inquirer')
+const API_URL = 'https://slack.com/api'
+
+/**
+ * @param {String} token
+ * @param {Boolean} onlyOldImages
+ */
+function accessFiles (token, onlyOldImages) {
+  const thirtyDaysAgo = new Date().getTime() - 30 * (1000 * 60 * 60 * 24)
+
+  got(`${API_URL}/files.list`, {
+    body: {
+      token: token,
+      ts_to: onlyOldImages ? thirtyDaysAgo : 0,
+      count: 1000
+    },
+    json: true
+  })
+    .then(response => deleteFiles(response.body.files))
+    .catch(error => console.error('Error while getting files.', error))
+
+  function deleteFiles (files) {
+    if(!files) {
+      console.error('Error while getting files.')
+      return
+    }
+
+    if (!files.length) {
+      console.info('There is no files to be deleted.')
+      return
+    }
+
+    console.log(`Deleting ${files.length} files...`)
+    files.map(file => deleteFile(file))
+  }
+
+  function deleteFile (file) {
+    got(`${API_URL}/files.delete`, { body: { token: token, file: file.id } })
+      .then(() => console.log(`${file.name} was deleted.`))
+      .catch(error => console.error('Error while deleting files.', error))
+  }
+}
+
+inquirer.prompt([{
+  message: 'Enter your Slack token.',
+  name: 'token',
+  type: 'input',
+}, {
+  message: 'Delete only 30 days old images?',
+  name: 'onlyOldImages',
+  type: 'confirm',
+  default: false
+}])
+  .then(answers => accessFiles(answers.token, answers.onlyOldImages))
+  .catch(error => console.error('Error while asking for token.', error))
