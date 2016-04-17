@@ -1,4 +1,5 @@
 # slack-delete-files
+
 > :warning: [Node.js](https://nodejs.org/) >= 5.0.0 required.
 
 Mass delete files from Slack using JavaScript.
@@ -7,6 +8,8 @@ Mass delete files from Slack using JavaScript.
 Slack comes with limited file storage and there's no way to bulk delete files using the web interface in order to free up space.
 
 This script lets you mass delete **all files** or only **files older than 30 days**.
+
+![Running slack-delete-files in terminal](https://cloud.githubusercontent.com/assets/5303585/14584305/b66b7930-0416-11e6-933a-2bd19a77b18a.gif)
 
 ## Install
 > It'll install the module globally so you can use it from anywhere in your computer.
