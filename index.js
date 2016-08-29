@@ -10,7 +10,7 @@ const API_URL = 'https://slack.com/api'
  * @param {Boolean} onlyOldFiles
  */
 function accessFiles (token, onlyOldFiles) {
-  const thirtyDaysAgo = new Date().getTime() - 30 * (1000 * 60 * 60 * 24)
+  const thirtyDaysAgo = Math.floor(new Date().getTime() / 1000) - 30 * 86400;
 
   got(`${API_URL}/files.list`, {
     body: {
