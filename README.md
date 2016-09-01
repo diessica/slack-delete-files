@@ -29,7 +29,4 @@ You'll be asked for a token. Get it in [Slack API documentation](https://api.sla
 - 1000 files per execution.
 
 ## License
-
-[![CC0](http://mirrors.creativecommons.org/presskit/buttons/88x31/svg/cc-zero.svg)](https://creativecommons.org/publicdomain/zero/1.0/)
-
-To the extent possible under law, [Diéssica Gurskas](https://diessi.ca) has waived all copyright and related or neighboring rights to this work.
+MIT
