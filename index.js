@@ -8,8 +8,9 @@ const API_URL = 'https://slack.com/api'
 /**
  * @param {String} token
  * @param {Boolean} onlyOldFiles
+ * @param {Boolean} keepPinned
  */
-function accessFiles (token, onlyOldFiles) {
+function accessFiles (token, onlyOldFiles, keepPinned) {
   const thirtyDaysAgo = Math.floor(new Date().getTime() / 1000) - 30 * 86400;
 
   got(`${API_URL}/files.list`, {
@@ -35,7 +36,16 @@ function accessFiles (token, onlyOldFiles) {
     }
 
     console.log(`Deleting ${files.length} files...`)
-    files.map(file => deleteFile(file))
+    if (keepPinned) {
+      files.map(file => {
+        if (!file.pinned_to) {
+          deleteFile(file)
+        }
+      })
+    } else {
+      files.map(file => deleteFile(file))
+    }
+
   }
 
   function deleteFile (file) {
@@ -54,6 +64,11 @@ inquirer.prompt([{
   name: 'onlyOldFiles',
   type: 'confirm',
   default: false
+}, {
+  message: 'Keep pinned files?',
+  name: 'keepPinned',
+  type: 'confirm',
+  default: false
 }])
-  .then(answers => accessFiles(answers.token, answers.onlyOldFiles))
+  .then(answers => accessFiles(answers.token, answers.onlyOldFiles, answers.keepPinned))
   .catch(error => console.error('Error while asking for token.', error))
