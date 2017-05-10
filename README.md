@@ -1,4 +1,4 @@
-# slack-delete-files [![npm version](https://img.shields.io/npm/v/slack-delete-files.svg)](https://www.npmjs.com/package/slack-delete-files)
+# slack-delete-files [![npm version](https://img.shields.io/npm/v/slack-delete-files.svg)](https://www.npmjs.com/package/slack-delete-files) [![Build Status](https://travis-ci.org/diessica/slack-delete-files.svg)](https://travis-ci.org/diessica/slack-delete-files)
 
 > Mass delete files from Slack using JavaScript.
 
