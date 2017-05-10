@@ -2,31 +2,32 @@
 
 > Mass delete files from Slack using JavaScript.
 
-## Motivation
-Slack comes with limited file storage and there's no way to bulk delete files using the web interface in order to free up space.
-
-This script lets you mass delete **all files** or only **files older than 30 days**.
-
-![Running slack-delete-files in terminal](https://cloud.githubusercontent.com/assets/5303585/14584305/b66b7930-0416-11e6-933a-2bd19a77b18a.gif)
+Because Slack comes with limited file storage and there's no way to bulk delete files using the web interface in order to free up space. ([Source](https://get.slack.help/hc/en-us/articles/218159688-Delete-shared-files))
 
 ## Install
-:warning: Make sure you have [Node.js](https://nodejs.org/) >= 5.0.0 installed.
+:warning: Make sure you have [Node.js](https://nodejs.org/) 5+ installed.
 
-```
-npm install -g slack-delete-files
+```sh
+$ npm install -g slack-delete-files
 ```
 
-> It'll install the module globally so you can use it from anywhere in your computer.
+> This installs it globally so you can use it from anywhere in your computer.
 
 ## Usage
-```
+
+```sh
 $ slack-delete-files
 ```
-You'll be asked for a token. Get it in [Slack API documentation](https://api.slack.com/docs/oauth-test-tokens).
 
-## Limitations
+A Slack API token is required. Grab yours in [Slack API docs](https://api.slack.com/custom-integrations/legacy-tokens)!
+
+###### Features
+- Can keep recent files, deleting only files older than **30 days**.
+- Can keep pinned files.
+
+###### Limitations
 - Cannot delete files sent privately.
-- 1000 files per execution.
+- Deletes up to 1000 files per execution.
 
 ## License
 MIT

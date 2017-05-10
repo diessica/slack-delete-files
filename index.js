@@ -5,63 +5,56 @@ const got = require('got')
 const inquirer = require('inquirer')
 const API_URL = 'https://slack.com/api'
 
-/**
- * @param {String} token
- * @param {Boolean} onlyOldFiles
- * @param {Boolean} keepPinned
- */
-function accessFiles (token, onlyOldFiles, keepPinned) {
-  const thirtyDaysAgo = Math.floor(new Date().getTime() / 1000) - 30 * 86400;
+function run (token, options) {
+  const thirtyDaysAgo = Math.floor(new Date().getTime() / 1000) - 30 * 86400
 
   got(`${API_URL}/files.list`, {
     body: {
-      token: token,
-      ts_to: onlyOldFiles ? thirtyDaysAgo : 0,
+      token,
+      ts_to: options.oldOnly ? thirtyDaysAgo : 0,
       count: 1000
     },
     json: true
   })
-    .then(response => deleteFiles(response.body.files))
-    .catch(error => console.error('Error while getting files.', error))
-
-  function deleteFiles (files) {
-    if(!files) {
-      console.error('Error while getting files.')
-      return
-    }
-
-    if (!files.length) {
-      console.info('There is no files to be deleted.')
-      return
-    }
-
-    console.log(`Deleting ${files.length} files...`)
-    if (keepPinned) {
-      files.map(file => {
-        if (!file.pinned_to) {
-          deleteFile(file)
-        }
-      })
-    } else {
-      files.map(file => deleteFile(file))
-    }
-
-  }
-
-  function deleteFile (file) {
-    got(`${API_URL}/files.delete`, { body: { token: token, file: file.id } })
-      .then(() => console.log(`${file.name} was deleted.`))
-      .catch(error => console.error('Error while deleting files.', error))
-  }
+    .then(response => filterFiles(response.body.files, options))
+    .then(files => deleteFiles(token, files))
+    .catch(console.error)
 }
 
+function filterFiles (files, options) {
+  if (!files) {
+    throw  'Unexpected response from API. Try generating another token!'
+  }
+
+  const removePinned = files => files.filter(file => !file.pinned_to)
+  const filesToDelete = options.keepPinned ? removePinned(files) : files
+
+  if (!filesToDelete.length) {
+    throw  'There are no files to be deleted.'
+  }
+
+  return filesToDelete
+}
+
+function deleteFiles (token, files) {
+  console.log(`Deleting ${files.length} file(s)...`)
+
+  files.forEach(file =>
+    got(`${API_URL}/files.delete`, { body: { token, file: file.id } })
+      .then(() => console.log(`${file.name} was deleted.`))
+      .catch(error => console.error('Error while deleting files.', error))
+  )
+}
+
+exports.filterFiles = filterFiles
+
 inquirer.prompt([{
-  message: 'Enter your Slack token.',
+  message: 'Please, enter your Slack token.',
   name: 'token',
-  type: 'input',
+  type: 'input'
 }, {
-  message: 'Delete only files older than 30 days?',
-  name: 'onlyOldFiles',
+  message: 'Delete ONLY files older than 30 days?',
+  name: 'oldOnly',
   type: 'confirm',
   default: false
 }, {
@@ -70,5 +63,8 @@ inquirer.prompt([{
   type: 'confirm',
   default: false
 }])
-  .then(answers => accessFiles(answers.token, answers.onlyOldFiles, answers.keepPinned))
+  .then(answers => run(answers.token, {
+    oldOnly: answers.oldOnly,
+    keepPinned: answers.keepPinned
+  }))
   .catch(error => console.error('Error while asking for token.', error))

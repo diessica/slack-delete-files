@@ -1,10 +1,10 @@
 {
   "name": "slack-delete-files",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "Mass delete files from Slack.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "ava test.js"
   },
   "author": "Diéssica Gurskas <diessicode@gmail.com> (https://diessi.ca)",
   "license": "MIT",
@@ -14,5 +14,8 @@
   },
   "bin": {
     "slack-delete-files": "index.js"
+  },
+  "devDependencies": {
+    "ava": "^0.19.1"
   }
 }
