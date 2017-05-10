@@ -2,6 +2,8 @@
 
 > Mass delete files from Slack using JavaScript.
 
+![Running slack-delete-files on terminal](https://cloud.githubusercontent.com/assets/5303585/25916939/c69d6b98-359c-11e7-8cc2-526420d18740.gif)
+
 Because Slack comes with limited file storage and there's no way to bulk delete files using the web interface in order to free up space. ([Source](https://get.slack.help/hc/en-us/articles/218159688-Delete-shared-files))
 
 ## Install
