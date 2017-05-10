@@ -8,7 +8,7 @@ test('[filterFiles] throws message for no results', t => {
 
 test('[filterFiles] throws message for unexpected responses', t => {
   const errorMessage = t.throws(() => filterFiles(undefined, {}))
-  t.is(errorMessage, 'Unexpected response from API.')
+  t.is(errorMessage, 'Unexpected response from API. Try generating another token!')
 })
 
 test('[filterFiles] doesn\'t include pinned files if inquired', t => {
