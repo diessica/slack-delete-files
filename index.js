@@ -3,6 +3,7 @@
 
 const got = require('got')
 const inquirer = require('inquirer')
+const argv = require('yargs').argv
 const API_URL = 'https://slack.com/api'
 
 function run (token, options) {
@@ -47,6 +48,23 @@ function deleteFiles (token, files) {
 }
 
 exports.filterFiles = filterFiles
+
+if (argv.token) {
+  let options = {
+    oldOnly: false,
+    keepPinned: false
+  }
+
+  if (argv.oldOnly) {
+    options.oldOnly = argv.oldOnly
+  }
+
+  if (argv.keepPinned) {
+    options.keepPinned = argv.keepPinned;
+  }
+
+  return run(argv.token, options)
+}
 
 inquirer.prompt([{
   message: 'Please, enter your Slack token.',
