@@ -4,6 +4,7 @@
   "description": "Mass delete files from Slack.",
   "main": "index.js",
   "scripts": {
+    "start": "node .",
     "test": "ava test.js"
   },
   "author": "Diéssica Gurskas <diessicode@gmail.com> (https://diessi.ca)",
