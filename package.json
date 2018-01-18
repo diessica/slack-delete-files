@@ -11,7 +11,8 @@
   "license": "MIT",
   "dependencies": {
     "got": "^6.3.0",
-    "inquirer": "^1.0.0"
+    "inquirer": "^1.0.0",
+    "yargs": "^8.0.2"
   },
   "bin": {
     "slack-delete-files": "index.js"
