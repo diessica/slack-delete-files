@@ -6,12 +6,12 @@ const inquirer = require('inquirer')
 const API_URL = 'https://slack.com/api'
 
 function run (token, options) {
-  const thirtyDaysAgo = Math.floor(new Date().getTime() / 1000) - 30 * 86400
+  const daysAgo = Math.floor(new Date().getTime() / 1000) - parseInt(options.oldDays, 10) * 86400
 
   got(`${API_URL}/files.list`, {
     body: {
       token,
-      ts_to: options.oldOnly ? thirtyDaysAgo : 0,
+      ts_to: options.oldOnly ? daysAgo : 0,
       count: 1000
     },
     json: true
@@ -53,18 +53,27 @@ inquirer.prompt([{
   name: 'token',
   type: 'input'
 }, {
-  message: 'Delete ONLY files older than 30 days?',
+  message: 'Delete ONLY older files?',
   name: 'oldOnly',
   type: 'confirm',
   default: false
+}, {
+  when: answers => answers.oldOnly,
+  message: 'How many older?',
+  name: 'oldDays',
+  type: 'input',
+  default: 30
 }, {
   message: 'Keep pinned files?',
   name: 'keepPinned',
   type: 'confirm',
   default: false
 }])
-  .then(answers => run(answers.token, {
-    oldOnly: answers.oldOnly,
-    keepPinned: answers.keepPinned
-  }))
+  .then(answers => {
+    return run(answers.token, {
+      oldOnly: answers.oldOnly,
+      oldDays:  answers.oldDays,
+      keepPinned: answers.keepPinned
+    })
+  })
   .catch(error => console.error('Error while asking for token.', error))
