@@ -2,7 +2,6 @@
 
 const got = require("got")
 const Limiter = require("bottleneck")
-const util = require("util")
 const argv = require("yargs")
   .option("token", {
     alias: "t",
