@@ -2,6 +2,7 @@
 
 const got = require("got")
 const Limiter = require("bottleneck")
+const util = require("util")
 const argv = require("yargs")
   .option("token", {
     alias: "t",
@@ -52,11 +53,20 @@ const deleteFiles = (files = []) => {
       method: "POST",
       body: { token: argv.token, file: file.id },
       json: true,
+      form: true,
       headers: {
         Authorization: `Bearer ${argv.token}`
       }
     })
-      .then(() => console.log(`${file.name} has been deleted.`))
+      .then(({ body }) => {
+        ({ ok, error, warning } = body);
+
+        if (ok) {
+          console.log(`${file.name} has been deleted.`)
+        } else {
+          console.error(`Error '${error}' while deleting file. ${warning || ''}`)
+        }
+      })
       .catch(error => console.error("Error while deleting file.", error))
   )
 }
@@ -70,7 +80,6 @@ const init = () => {
     json: true
   })
     .then(response => response.body.files)
-    .then(filterFiles({ deletePinned: argv.pinned }))
     .then(deleteFiles)
     .catch(console.error)
 }
