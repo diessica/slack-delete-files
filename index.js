@@ -79,6 +79,7 @@ const init = () => {
     json: true
   })
     .then(response => response.body.files)
+    .then(filterFiles({ deletePinned: argv.pinned }))
     .then(deleteFiles)
     .catch(console.error)
 }
