@@ -45,7 +45,7 @@ exports.filterFiles = filterFiles
 const deleteFiles = (files = []) => {
   console.log(`Deleting ${files.length} file(s)...`)
 
-  const gotLimited = new Limiter({ maxConcurrent: 1, minTime: 1000 }).wrap(got)
+  const gotLimited = new Limiter({ maxConcurrent: 1, minTime: 2000 }).wrap(got)
 
   files.forEach(file =>
     gotLimited(`${API_URL}/files.delete`, {
