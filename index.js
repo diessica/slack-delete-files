@@ -52,11 +52,20 @@ const deleteFiles = (files = []) => {
       method: "POST",
       body: { token: argv.token, file: file.id },
       json: true,
+      form: true,
       headers: {
         Authorization: `Bearer ${argv.token}`
       }
     })
-      .then(() => console.log(`${file.name} has been deleted.`))
+      .then(({ body }) => {
+        ({ ok, error, warning } = body);
+
+        if (ok) {
+          console.log(`${file.name} has been deleted.`)
+        } else {
+          console.error(`Error '${error}' while deleting file. ${warning || ''}`)
+        }
+      })
       .catch(error => console.error("Error while deleting file.", error))
   )
 }
