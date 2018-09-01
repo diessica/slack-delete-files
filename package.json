@@ -14,9 +14,9 @@
   "author": "Diéssica Gurskas <diessicode@gmail.com> (https://diessi.ca)",
   "license": "MIT",
   "dependencies": {
-    "bottleneck": "^2.3.0",
-    "got": "^8.3.1",
-    "yargs": "^11.0.0"
+    "bottleneck": "^2.8.0",
+    "got": "^9.2.0",
+    "yargs": "^12.0.1"
   },
   "bin": {
     "slack-delete-files": "index.js"
