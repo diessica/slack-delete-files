@@ -6,13 +6,16 @@ Because Slack comes with limited file storage and there's no way to bulk delete 
 
 ## Install
 
-:warning: Make sure you have [Node.js](https://nodejs.org/) 8+ installed.
+:warning: This app depends on [Node.js](https://nodejs.org/) 8+.
 
 ```sh
 $ npm install -g slack-delete-files
 ```
 
-> The `-g` flag installs it globally so you can use it from anywhere in your computer.
+Instead of polluting global installs, you can also run the Node binary directly:
+```sh
+$ npx slack-delete-files
+```
 
 ## Usage
 
