@@ -2,36 +2,37 @@
 
 const got = require("got")
 const Limiter = require("bottleneck")
-const argv = require("yargs")
-  .option("token", {
-    alias: "t",
-    describe: "Slack token",
-    type: "string",
-    demandOption: process.env.NODE_ENV !== "test"
-  })
-  .option("pinned", {
-    describe: "Include pinned files",
-    default: false,
-    type: "boolean"
-  })
-  .option("max", {
-    describe: "Amount of files to fetch",
-    default: 1000,
-    type: "number",
-    number: true
-  })
-  .option("age", {
-    describe: "Delete only files older than the specified number of days",
-    default: 30,
-    type: "number",
-    number: true
-  }).argv
-const gotLimited = new Limiter({ maxConcurrent: 1, minTime: 2000 }).wrap(got)
-const API_URL = "https://slack.com/api"
+const options = require("./cli-options")
+const { argv } = require("yargs").options(options)
 
-const filterFiles = ({ deletePinned }) => (files = []) => {
+const slackClient = new Limiter({
+  maxConcurrent: 1,
+  minTime: 2000
+}).wrap(
+  got.extend({
+    baseUrl: "https://slack.com/api",
+    headers: { Authorization: `Bearer ${argv.token}` }
+  })
+)
+
+const getFiles = () => {
+  const ONE_DAY_IN_SECONDS = 86400
+  const age = Math.floor(Date.now() / 1000) - argv.age * ONE_DAY_IN_SECONDS
+
+  return slackClient("files.list", {
+    body: {
+      token: argv.token,
+      ts_to: age,
+      count: argv.max
+    },
+    form: true,
+    json: true
+  }).then(response => response.body.files)
+}
+
+const filterFiles = ({ shouldDeletePinned }) => (files = []) => {
   const excludePinned = files => files.filter(file => !file.pinned_to)
-  const filesToDelete = deletePinned ? files : excludePinned(files)
+  const filesToDelete = shouldDeletePinned ? files : excludePinned(files)
 
   if (!filesToDelete.length) {
     throw `There are no files older than ${argv.age} days to delete.`
@@ -40,47 +41,36 @@ const filterFiles = ({ deletePinned }) => (files = []) => {
   return filesToDelete
 }
 
-exports.filterFiles = filterFiles
-
 const deleteFiles = (files = []) => {
   console.log(`Deleting ${files.length} file(s)...`)
 
   files.forEach(file =>
-    gotLimited(`${API_URL}/files.delete`, {
+    slackClient("files.delete", {
       method: "POST",
       body: { token: argv.token, file: file.id },
       json: true,
-      form: true,
-      headers: {
-        Authorization: `Bearer ${argv.token}`
-      }
+      form: true
     })
       .then(({ body }) => {
         const { ok, error, warning } = body
-        if (ok) {
-          console.log(`${file.name} has been deleted.`)
-        } else {
-          console.error(
-            `Error '${error}' while deleting file. ${warning || ""}`
-          )
-        }
+        console.log(
+          ok
+            ? `${file.name} has been deleted.`
+            : `Error '${error}' while deleting file. ${warning || ""}`
+        )
       })
       .catch(error => console.error("Error while deleting file.", error))
   )
 }
 
-const init = () => {
-  const age = Math.floor(new Date().getTime() / 1000) - argv.age * 86400
-
-  got(`${API_URL}/files.list`, {
-    body: { token: argv.token, ts_to: age, count: argv.max },
-    form: true,
-    json: true
-  })
-    .then(response => response.body.files)
-    .then(filterFiles({ deletePinned: argv.pinned }))
+const init = () =>
+  getFiles()
+    .then(filterFiles({ shouldDeletePinned: argv.pinned }))
     .then(deleteFiles)
     .catch(console.error)
-}
 
 init()
+
+module.exports = {
+  filterFiles
+}
