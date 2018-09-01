@@ -10,7 +10,7 @@ const argv = require("yargs")
     demandOption: process.env.NODE_ENV !== "test"
   })
   .option("pinned", {
-    describe: "Include pinned files when deleting",
+    describe: "Include pinned files",
     default: false,
     type: "boolean"
   })
@@ -26,7 +26,7 @@ const argv = require("yargs")
     type: "number",
     number: true
   }).argv
-
+const gotLimited = new Limiter({ maxConcurrent: 1, minTime: 2000 }).wrap(got)
 const API_URL = "https://slack.com/api"
 
 const filterFiles = ({ deletePinned }) => (files = []) => {
@@ -34,7 +34,7 @@ const filterFiles = ({ deletePinned }) => (files = []) => {
   const filesToDelete = deletePinned ? files : excludePinned(files)
 
   if (!filesToDelete.length) {
-    throw "There are no files to be deleted."
+    throw `There are no files older than ${argv.age} days to delete.`
   }
 
   return filesToDelete
@@ -44,8 +44,6 @@ exports.filterFiles = filterFiles
 
 const deleteFiles = (files = []) => {
   console.log(`Deleting ${files.length} file(s)...`)
-
-  const gotLimited = new Limiter({ maxConcurrent: 1, minTime: 2000 }).wrap(got)
 
   files.forEach(file =>
     gotLimited(`${API_URL}/files.delete`, {
@@ -58,12 +56,13 @@ const deleteFiles = (files = []) => {
       }
     })
       .then(({ body }) => {
-        ({ ok, error, warning } = body);
-
+        const { ok, error, warning } = body
         if (ok) {
           console.log(`${file.name} has been deleted.`)
         } else {
-          console.error(`Error '${error}' while deleting file. ${warning || ''}`)
+          console.error(
+            `Error '${error}' while deleting file. ${warning || ""}`
+          )
         }
       })
       .catch(error => console.error("Error while deleting file.", error))
