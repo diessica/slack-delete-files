@@ -14,7 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 * Improved error handling for each image deleting. ([PR #10](https://github.com/diessica/slack-delete-files/pull/10), thanks to [@BoLaMN](https://github.com/BoLaMN))
 * Improved feedback message when getting files by outputting the file's age in days you are checking for. ([PR #13](https://github.com/diessica/slack-delete-files/pull/13))
 - Updated dependencies.
-- Refactored CLI options out of app itself, and other minor refactors for readability.
+- Refactored CLI options out of app itself, and other minor refactors for readability. ([PR #14's commit](https://github.com/diessica/slack-delete-files/pull/14/commits/f7ea71874857d8c2c0a0c90ee39bba042ea7679a))
 
 ## 2.0.0 (May 16th, 2018)
 * Introduced command line args instead of the previous interactive command-line interface. ([Issue #4](https://github.com/diessica/slack-delete-files/issues/4))
