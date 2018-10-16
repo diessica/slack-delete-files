@@ -15,6 +15,8 @@ const slackClient = new Limiter({
   })
 )
 
+const formatBytes = (a,b) => {if(0==a)return"0 Bytes";var c=1024,d=b||2,e=["Bytes","KB","MB","GB","TB","PB","EB","ZB","YB"],f=Math.floor(Math.log(a)/Math.log(c));return parseFloat((a/Math.pow(c,f)).toFixed(d))+" "+e[f]}
+
 const getFiles = () => {
   const ONE_DAY_IN_SECONDS = 86400
   const age = Math.floor(Date.now() / 1000) - argv.age * ONE_DAY_IN_SECONDS
@@ -44,23 +46,31 @@ const filterFiles = ({ shouldDeletePinned }) => (files = []) => {
 const deleteFiles = (files = []) => {
   console.log(`Deleting ${files.length} file(s)...`)
 
-  files.forEach(file =>
-    slackClient("files.delete", {
-      method: "POST",
-      body: { token: argv.token, file: file.id },
-      json: true,
-      form: true
-    })
-      .then(({ body }) => {
-        const { ok, error, warning } = body
-        console.log(
-          ok
-            ? `${file.name} has been deleted.`
-            : `Error '${error}' while deleting file. ${warning || ""}`
-        )
+  var totalBytes = 0
+  files.forEach(file => {
+    totalBytes += file.size 
+    if (argv.dryrun) {
+      console.log('Deleting file named ' + file.name + ' will clean out ' + formatBytes(file.size) + '.')
+    }
+    else {
+      slackClient("files.delete", {
+        method: "POST",
+        body: { token: argv.token, file: file.id },
+        json: true,
+        form: true
       })
-      .catch(error => console.error("Error while deleting file.", error))
-  )
+        .then(({ body }) => {
+          const { ok, error, warning } = body
+          console.log(
+            ok
+              ? `${file.name} has been deleted.`
+              : `Error '${error}' while deleting file. ${warning || ""}`
+          )
+        })
+        .catch(error => console.error("Error while deleting file.", error))
+    }
+  })
+  console.log('This will clean up ' + formatBytes(totalBytes) + '.')
 }
 
 const init = () =>
@@ -69,6 +79,7 @@ const init = () =>
     .then(deleteFiles)
     .catch(console.error)
 
+if (argv.dryrun) console.log('<<DRY RUN ONLY - NO FILES WILL BE DELETED>>')
 init()
 
 module.exports = {

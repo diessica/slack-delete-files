@@ -30,6 +30,8 @@ Options:
   --max        Amount of files to fetch                 [number] [default: 1000]
   --age        Delete only files older than the specified number of days
                                                           [number] [default: 30]
+  --dryrun     If true, only print the files that would be deleted, without
+               deleting them.                         [boolean] [default: false]
 ```
 
 A Slack API token (`--token`) is required! Grab yours in [Slack API docs](https://api.slack.com/custom-integrations/legacy-tokens).
