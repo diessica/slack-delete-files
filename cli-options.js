@@ -21,5 +21,10 @@ module.exports = {
     default: 30,
     type: "number",
     number: true
+  },
+  dryrun: {
+    describe: "If true, only print the files that would be deleted, without deleting them.",
+    default: false,
+    type: "boolean"
   }
 }
